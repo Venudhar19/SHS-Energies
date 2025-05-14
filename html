@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar ROI Calculator | SHS Energies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #fdd835;
+      margin-bottom: 30px;
+    }
+    label {
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: white;
+    }
+    button {
+      background: #fdd835;
+      color: #111;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ffeb3b;
+    }
+    .output {
+      margin-top: 30px;
+      background: #2d2d2d;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .output h3 {
+      margin-top: 0;
+      color: #80cbc4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SHS Solar ROI Calculator</h1>
+    <label for="bill">Monthly Electricity Bill (₹)</label>
+    <input type="number" id="bill" placeholder="e.g. 2500" />
+
+    <label for="roof">Available Roof Space (sq. ft.)</label>
+    <input type="number" id="roof" placeholder="e.g. 600" />
+
+    <label for="system">System Type</label>
+    <select id="system">
+      <option value="on-grid">On-Grid</option>
+      <option value="off-grid">Off-Grid</option>
+      <option value="hybrid">Hybrid</option>
+    </select>
+
+    <label for="subsidy">Subsidy Amount (₹, optional)</label>
+    <input type="number" id="subsidy" placeholder="e.g. 30000" />
+
+    <button onclick="calculateROI()">Calculate ROI</button>
+
+    <div class="output" id="results" style="display:none">
+      <h3>Estimated System Size: <span id="size"></span> kW</h3>
+      <p>Estimated Cost (after subsidy): ₹<span id="cost"></span></p>
+      <p>Estimated Annual Savings: ₹<span id="savings"></span></p>
+      <p>Payback Period: <span id="payback"></span> years</p>
+      <p>Total 25-Year ROI: ₹<span id="roi"></span></p>
+    </div>
+  </div>
+
+  <script>
+    function calculateROI() {
+      const bill = parseFloat(document.getElementById("bill").value);
+      const roof = parseFloat(document.getElementById("roof").value);
+      const systemType = document.getElementById("system").value;
+      const subsidy = parseFloat(document.getElementById("subsidy").value || 0);
+
+      if (!bill || !roof) {
+        alert("Please enter valid inputs.");
+        return;
+      }
+
+      // Rough estimate: 1kW needs ~100 sq. ft.
+      let size = Math.min((roof / 100), bill / 500); // A balance of roof and bill
+      size = Math.round(size * 10) / 10;
+
+      // Estimated cost per kW
+      let ratePerKW = systemType === "off-grid" ? 65000 : systemType === "hybrid" ? 80000 : 55000;
+      let cost = size * ratePerKW - subsidy;
+
+      // Annual savings (₹6/kWh * 1100 units per kW per year)
+      let annualSavings = size * 1100 * 6;
+
+      // Payback
+      let payback = cost / annualSavings;
+
+      // 25-year ROI
+      let roi = annualSavings * 25;
+
+      document.getElementById("size").innerText = size;
+      document.getElementById("cost").innerText = cost.toFixed(0);
+      document.getElementById("savings").innerText = annualSavings.toFixed(0);
+      document.getElementById("payback").innerText = payback.toFixed(1);
+      document.getElementById("roi").innerText = roi.toFixed(0);
+
+      document.getElementById("results").style.display = "block";
+    }
+  </script>
+</body>
+</html>
